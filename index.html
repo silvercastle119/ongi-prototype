@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ONGI 프로토타입</title>
+<meta name="description" content="AI 화분과 연동되는 식물 돌봄 앱 ONGI의 인터랙티브 프로토타입">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="stage">
+  <div class="phone-wrap" id="phoneWrap">
+    <div class="phone" id="phone">
+
+      <!-- ===== 01 식물 설문 ===== -->
+      <section class="screen" data-screen="survey">
+        <div class="topnav">
+          <button class="back-btn glass" data-action="survey-back" aria-label="뒤로"><img src="assets/back.svg" width="20" height="20" alt=""></button>
+          <div class="progress"><div class="progress-fill" id="surveyProgress"></div></div>
+          <span class="step-label" id="surveyStep">1/3</span>
+        </div>
+        <div class="q-block">
+          <h1 class="q-title" id="surveyTitle"></h1>
+          <p class="q-hint" id="surveyHint"></p>
+        </div>
+        <div class="options" id="surveyOptions"></div>
+        <div class="bottom-btns">
+          <button class="btn btn-secondary" style="width:104px" data-action="survey-skip">건너뛰기</button>
+          <button class="btn btn-primary" data-action="survey-next">다음</button>
+        </div>
+      </section>
+
+      <!-- ===== 02 식물 검색 및 스캔 ===== -->
+      <section class="screen" data-screen="search">
+        <div class="topnav">
+          <button class="back-btn glass" data-action="go" data-to="survey" aria-label="뒤로"><img src="assets/back.svg" width="20" height="20" alt=""></button>
+        </div>
+        <div class="q-block">
+          <h1 class="q-title">어떤 식물을<br>키우고 있나요?</h1>
+          <p class="q-hint">이름을 검색하거나 사진을 찍어보세요</p>
+        </div>
+        <div class="search-row">
+          <label class="search-input glass">
+            <img src="assets/ic-search.svg" width="20" height="20" alt="">
+            <input id="plantSearch" type="text" placeholder="식물 이름 검색" autocomplete="off">
+          </label>
+          <button class="scan-btn" data-action="scan" aria-label="사진으로 찾기"><img src="assets/ic-scan.svg" width="24" height="24" alt=""></button>
+        </div>
+        <p class="list-title" id="plantListTitle">많이 키우는 식물</p>
+        <div class="plant-list" id="plantList"></div>
+
+        <div class="scan-overlay" id="scanOverlay">
+          <div class="scan-view">
+            <img class="scan-photo" src="assets/plant-monstera.png" alt="">
+            <div class="scan-frame"><i></i><i></i><i></i><i></i><div class="scan-line"></div></div>
+          </div>
+          <p class="scan-text" id="scanText">식물을 화면 가운데에 맞춰주세요</p>
+          <button class="scan-close" data-action="scan-close">취소</button>
+        </div>
+      </section>
+
+      <!-- ===== 03 식물 프로필 ===== -->
+      <section class="screen" data-screen="profile">
+        <div class="topnav">
+          <button class="back-btn glass" data-action="go" data-to="search" aria-label="뒤로"><img src="assets/back.svg" width="20" height="20" alt=""></button>
+          <p class="nav-title">프로필 만들기</p>
+        </div>
+        <div class="profile-head">
+          <img class="profile-photo" id="profilePhoto" src="assets/plant-monstera.png" alt="">
+          <span class="tag" id="profileSpecies">몬스테라</span>
+        </div>
+        <div class="form">
+          <div class="field">
+            <label class="field-label" for="fName">이름</label>
+            <input class="field-input glass" id="fName" maxlength="10" placeholder="이름을 지어주세요">
+          </div>
+          <div class="field">
+            <span class="field-label">성별 (선택)</span>
+            <div class="chips" id="genderChips">
+              <button class="chip on" data-v="none">선택 안 함</button>
+              <button class="chip" data-v="m">남</button>
+              <button class="chip" data-v="f">여</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="fDate">생일 또는 우리 집에 온 날</label>
+            <label class="field-input glass date-field">
+              <input id="fDate" type="date" value="2026-08-29">
+              <img src="assets/ic-calendar.svg" width="20" height="20" alt="">
+            </label>
+          </div>
+          <div class="field">
+            <label class="field-label" for="fIntro">한 줄 소개</label>
+            <input class="field-input glass filled" id="fIntro" maxlength="30" value="거실 창가에 사는 첫 식물">
+          </div>
+        </div>
+        <div class="bottom-btns">
+          <button class="btn btn-secondary" style="width:128px" data-action="profile-done" data-later="1">나중에 할게요</button>
+          <button class="btn btn-primary" data-action="profile-done">완료</button>
+        </div>
+      </section>
+
+      <!-- ===== 04 / 08 / 09 홈 ===== -->
+      <section class="screen tab" data-screen="home">
+        <div class="garden" id="garden">
+          <div class="deco-layer" id="decoLayer"></div>
+
+          <div class="pot-halo" id="potHalo"></div>
+          <div class="pot" id="pot" role="button" aria-label="화분 상태 보기">
+            <img class="ring r1" src="assets/pot-1.svg" alt="">
+            <img class="ring r3" src="assets/pot-3.svg" alt="">
+            <img class="ring r5" src="assets/pot-5.svg" alt="">
+            <img class="ring r7" src="assets/pot-7.svg" alt="">
+            <img class="ring hole" src="assets/pot-hole.svg" alt="">
+            <svg class="pot-mods" id="potMods" viewBox="0 0 360 180" width="360" height="180" aria-hidden="true"></svg>
+          </div>
+
+          <div class="plant" id="plant">
+            <div class="plant-inner" id="plantInner">
+              <img class="plant-stem" src="assets/plant-stem.svg" alt="">
+              <img class="plant-leaves" src="assets/plant-leaves.svg" alt="">
+            </div>
+          </div>
+
+          <div class="char-wrap" id="charWrap" hidden>
+            <div class="char" id="char">
+              <img class="c-shadow" src="assets/char-shadow.svg" alt="">
+              <img class="c-feet" src="assets/char-feet.svg" alt="">
+              <div class="c-body" id="charBody"></div>
+              <div class="c-swirl" aria-hidden="true">
+                <svg viewBox="0 0 40 16" width="40" height="16"><path d="M4 8c0-3 3-5 6-5s5 3 3 5-6 1-5-2M22 8c0-3 3-5 6-5s5 3 3 5-6 1-5-2" fill="none" stroke="#6b8d62" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="fx-layer" id="fxLayer"></div>
+
+          <button class="today-q glass" id="todayQ" data-action="open-diary">
+            <span class="today-q-text" id="todayQText"></span>
+            <span class="today-q-btn"><span id="todayQBtn">답하러 가기</span><img src="assets/ic-chevron-sm.svg" width="8" height="8" alt=""></span>
+          </button>
+
+          <div class="quest-sheet glass" id="questSheet">
+            <button class="sheet-handle" data-action="toggle-quests" aria-label="퀘스트 펼치기"><span></span></button>
+            <div class="quest-head">
+              <h2>오늘의 퀘스트</h2>
+              <p id="questCount"></p>
+            </div>
+            <div id="questList" class="quest-list"></div>
+          </div>
+        </div>
+
+        <header class="home-header">
+          <div class="logo">
+            <!-- assets/logo-header.svg 를 넣으면 그 로고가 쓰이고, 없으면 아래 임시 로고가 보인다 -->
+            <img class="logo-full" src="assets/logo-header.svg" alt="ONGI" onload="this.parentNode.classList.add('has-full')" onerror="this.remove()">
+            <img class="logo-fallback" src="assets/logo.svg" width="29.6" height="17.9" alt="">
+            <span class="logo-word logo-fallback">ong<i></i></span>
+          </div>
+          <div class="header-btns">
+            <button class="icon-btn glass" data-action="noti" aria-label="알림"><img src="assets/ic-bell.svg" width="20" height="20" alt=""><span class="noti-dot" id="notiDot"></span></button>
+            <button class="icon-btn glass" data-action="tab" data-to="my" aria-label="내 정보"><img src="assets/ic-user.svg" width="20" height="20" alt=""></button>
+          </div>
+        </header>
+        <div class="item-bar" id="itemBar">
+          <button class="item-chip glass" data-item="point"><img src="assets/ic-point.svg" width="16" height="16" alt=""><b id="cntPoint"></b></button>
+          <button class="item-chip glass" data-item="water"><img src="assets/ic-drop.svg" width="16" height="16" alt=""><b id="cntWater"></b></button>
+          <button class="item-chip glass" data-item="heart"><img src="assets/ic-heart.svg" width="16" height="16" alt=""><b id="cntHeart"></b></button>
+          <button class="item-chip glass" data-item="sun"><img src="assets/ic-sun.svg" width="16" height="16" alt=""><b id="cntSun"></b></button>
+        </div>
+      </section>
+
+      <!-- ===== 05 문답 일기 ===== -->
+      <section class="screen" data-screen="diary">
+        <div class="topnav">
+          <button class="back-btn glass" data-action="tab" data-to="home" aria-label="뒤로"><img src="assets/back.svg" width="20" height="20" alt=""></button>
+          <p class="nav-title">오늘의 질문</p>
+          <span class="nav-date" id="diaryDate"></span>
+        </div>
+        <div class="diary-scroll">
+          <h1 class="diary-q" id="diaryQ"></h1>
+          <div class="answer-box glass">
+            <textarea id="diaryAnswer" maxlength="200" placeholder="짧게 적어도 괜찮아요"></textarea>
+            <span class="answer-count" id="diaryCount">0 / 200</span>
+          </div>
+          <p class="section-title" style="margin-top:24px">오늘 나의 마음은?</p>
+          <div class="mood-row" id="moodRow"></div>
+          <div class="extra">
+            <p class="extra-head">하나만 더 물어볼게요 <span>(선택)</span></p>
+            <p class="extra-q" id="diaryFollow"></p>
+            <input class="extra-input" id="diaryExtra" placeholder="답하고 싶다면 적어주세요" maxlength="80">
+          </div>
+        </div>
+        <div class="bottom-btns">
+          <button class="btn btn-secondary" style="width:120px" data-action="tab" data-to="home">건너뛰기</button>
+          <button class="btn btn-primary" data-action="diary-done">완료</button>
+        </div>
+      </section>
+
+      <!-- ===== 06 달력 ===== -->
+      <section class="screen tab" data-screen="calendar">
+        <h1 class="page-title">기록</h1>
+        <div class="month-nav">
+          <button data-action="month" data-d="-1" aria-label="이전 달"><img src="assets/ic-chevron-left.svg" width="20" height="20" alt=""></button>
+          <span id="monthLabel"></span>
+          <button data-action="month" data-d="1" aria-label="다음 달"><img src="assets/ic-chevron.svg" width="20" height="20" alt=""></button>
+        </div>
+        <div class="calendar glass">
+          <div class="cal-row cal-dow"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+          <div id="calGrid"></div>
+        </div>
+        <div class="day-card glass" id="dayCard"></div>
+      </section>
+
+      <!-- ===== 07 새 식물 등장 ===== -->
+      <section class="screen" data-screen="arrival">
+        <img class="spot-beam" src="assets/spot-beam.svg" alt="">
+        <img class="spot-floor" src="assets/spot-floor.svg" alt="">
+        <img class="spot-glow" src="assets/spot-glow.svg" alt="">
+        <div class="big-char" id="bigChar"></div>
+        <img class="sparkle s1" src="assets/sparkle-1.svg" width="20" height="20" alt="">
+        <img class="sparkle s2" src="assets/sparkle-2.svg" width="16" height="16" alt="">
+        <img class="sparkle s3" src="assets/sparkle-3.svg" width="12" height="12" alt="">
+        <img class="sparkle s4" src="assets/sparkle-4.svg" width="10" height="10" alt="">
+        <div class="arrival-text">
+          <h1>새로운 식물이<br>찾아왔어요</h1>
+          <p>당신의 하루를 닮은<br>당신만의 식물이에요</p>
+        </div>
+        <p class="arrival-sub" id="arrivalSub"></p>
+        <button class="btn btn-primary arrival-btn" data-action="meet">만나러 가기</button>
+      </section>
+
+      <!-- ===== 10 상점 ===== -->
+      <section class="screen tab" data-screen="shop">
+        <h1 class="page-title">상점</h1>
+        <div class="item-chip glass shop-point"><img src="assets/ic-point.svg" width="16" height="16" alt=""><b id="shopPoint"></b></div>
+        <div class="cats" id="shopCats">
+          <button class="cat on" data-cat="all">전체</button>
+          <button class="cat" data-cat="garden">정원 소품</button>
+          <button class="cat" data-cat="pot">화분 꾸미기</button>
+          <button class="cat" data-cat="char">캐릭터</button>
+        </div>
+        <div class="shop-scroll">
+          <button class="shop-hero" data-action="buy" data-id="tulip">
+            <span class="shop-hero-text">
+              <span class="hero-label">이번 주 추천</span>
+              <span class="hero-title">작은 정원을 꾸며보세요</span>
+              <span class="hero-desc">튤립 화단 600P</span>
+            </span>
+            <span class="hero-art"><img src="assets/shop-hero.svg" alt=""></span>
+          </button>
+          <div class="goods" id="goods"></div>
+        </div>
+      </section>
+
+      <!-- ===== 11 마이 ===== -->
+      <section class="screen tab" data-screen="my">
+        <h1 class="page-title">마이</h1>
+        <button class="icon-btn glass my-settings" data-action="settings" aria-label="설정"><img src="assets/ic-settings.svg" width="20" height="20" alt=""></button>
+        <div class="my-scroll">
+          <button class="my-profile glass" data-action="edit-nick">
+            <span class="avatar" id="myAvatar"></span>
+            <span class="my-name" id="myName">닉네임</span>
+            <img src="assets/ic-chevron-gray.svg" width="20" height="20" alt="">
+          </button>
+          <div class="stats">
+            <div class="stat glass"><b id="statDays"></b><span>기록</span></div>
+            <div class="stat glass"><b id="statCare"></b><span>돌봄</span></div>
+            <div class="stat glass"><b id="statPoint"></b><span>포인트</span></div>
+          </div>
+          <p class="section-title" style="margin-top:24px">내 식물</p>
+          <div class="my-plants" id="myPlants"></div>
+          <div class="menu glass">
+            <button class="menu-row" data-action="menu" data-m="pot"><img src="assets/menu-pot.svg" width="20" height="20" alt=""><span>화분 연결 관리</span><img src="assets/ic-chevron-gray.svg" width="20" height="20" alt=""></button>
+            <button class="menu-row" data-action="menu" data-m="box"><img src="assets/menu-box.svg" width="20" height="20" alt=""><span>보관함</span><img src="assets/ic-chevron-gray.svg" width="20" height="20" alt=""></button>
+            <button class="menu-row" data-action="menu" data-m="noti"><img src="assets/menu-bell.svg" width="20" height="20" alt=""><span>알림 설정</span><img src="assets/ic-chevron-gray.svg" width="20" height="20" alt=""></button>
+            <button class="menu-row" data-action="menu" data-m="notice"><img src="assets/menu-notice.svg" width="20" height="20" alt=""><span>공지사항</span><img src="assets/ic-chevron-gray.svg" width="20" height="20" alt=""></button>
+            <button class="menu-row" data-action="menu" data-m="cs"><img src="assets/menu-cs.svg" width="20" height="20" alt=""><span>고객센터</span><img src="assets/ic-chevron-gray.svg" width="20" height="20" alt=""></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 공통: GNB -->
+      <nav class="gnb glass" id="gnb">
+        <button data-action="tab" data-to="home"><img data-on="assets/gnb-home.svg" data-off="assets/gnb-home-off.svg" width="24" height="24" alt=""><span>홈</span></button>
+        <button data-action="tab" data-to="calendar"><img data-on="assets/gnb-cal-on.svg" data-off="assets/gnb-cal.svg" width="24" height="24" alt=""><span>기록</span></button>
+        <button data-action="tab" data-to="shop"><img data-on="assets/gnb-shop-on.svg" data-off="assets/gnb-shop.svg" width="24" height="24" alt=""><span>상점</span></button>
+        <button data-action="tab" data-to="my"><img data-on="assets/gnb-my-on.svg" data-off="assets/gnb-my.svg" width="24" height="24" alt=""><span>마이</span></button>
+      </nav>
+
+      <!-- 공통: 바텀시트 -->
+      <div class="sheet-layer" id="sheetLayer">
+        <div class="dim" data-action="sheet-close"></div>
+        <div class="sheet" id="sheet"></div>
+      </div>
+
+      <div class="toast" id="toast"></div>
+
+      <!-- 공통: 상태 바 / 홈 인디케이터 -->
+      <div class="statusbar" id="statusbar">
+        <span class="sb-time">9:41</span>
+        <span class="sb-island"></span>
+        <img class="sb-icons" id="sbIcons" src="assets/statusbar.svg" width="66" height="12" alt="">
+      </div>
+      <div class="home-ind" id="homeInd"></div>
+    </div>
+  </div>
+
+  <!-- 프로토타입 컨트롤 (실제 화분 이벤트 시뮬레이션) -->
+  <aside class="dev">
+    <h2>프로토타입 컨트롤</h2>
+    <p class="dev-desc">실제 화분에서 들어오는 이벤트를 흉내 냅니다.</p>
+    <p class="dev-note" id="devNote"></p>
+    <div class="dev-group">
+      <span class="dev-label">실제 화분 돌보기 <em>(점 표시 = 지금 화분이 원하는 것)</em></span>
+      <div class="dev-grid" id="devNeeds">
+        <button data-care="thirst">물 주기</button>
+        <button data-care="sun">햇빛 쬐어주기</button>
+        <button data-care="climate">온습도 맞춰주기</button>
+        <button data-care="nutrient">영양제 넣어주기</button>
+        <button data-care="air">창문 열어 환기</button>
+      </div>
+    </div>
+    <div class="dev-group">
+      <span class="dev-label">새 식물 캐릭터 <em>(% = 마음 기록 비율, 누르면 직접 선택)</em></span>
+      <div class="dev-chars" id="devChars"></div>
+    </div>
+    <div class="dev-group">
+      <span class="dev-label">이해도 레벨 <em>(자동: 캐릭터 전 1, 등장 후 2, 어린 잎부터 3)</em></span>
+      <div class="dev-grid four" id="devLevels">
+        <button data-level="auto">자동</button>
+        <button data-level="1">Lv.1</button>
+        <button data-level="2">Lv.2</button>
+        <button data-level="3">Lv.3</button>
+      </div>
+    </div>
+    <div class="dev-group">
+      <span class="dev-label">파동 직접 재생 <em>(현재 레벨의 의미로)</em></span>
+      <div class="dev-grid" id="devPatterns">
+        <button data-pattern="1">01 잔잔한</button>
+        <button data-pattern="2">02 퍼지는</button>
+        <button data-pattern="3">03 불규칙</button>
+        <button data-pattern="4">04 순차 확장</button>
+        <button data-pattern="5">05 회전</button>
+        <button data-pattern="0">자동</button>
+      </div>
+    </div>
+    <div class="dev-group">
+      <span class="dev-label">시간대</span>
+      <div class="dev-grid four" id="devTimes">
+        <button data-time="auto">실제</button>
+        <button data-time="morning">아침</button>
+        <button data-time="evening">저녁</button>
+        <button data-time="night">밤</button>
+      </div>
+    </div>
+    <div class="dev-group">
+      <span class="dev-label">진행</span>
+      <button data-dev="nextday">다음 날로</button>
+      <button data-dev="arrive">새 식물 등장시키기</button>
+      <button data-dev="xp">캐릭터 경험치 +50</button>
+      <button data-dev="points">포인트 +500</button>
+    </div>
+    <div class="dev-group">
+      <span class="dev-label">바로 가기</span>
+      <div class="dev-jumps">
+        <button data-jump="survey">01 설문</button>
+        <button data-jump="search">02 검색</button>
+        <button data-jump="profile">03 프로필</button>
+        <button data-jump="home">04 홈</button>
+        <button data-jump="diary">05 문답</button>
+        <button data-jump="calendar">06 달력</button>
+        <button data-jump="arrival">07 등장</button>
+        <button data-jump="shop">10 상점</button>
+        <button data-jump="my">11 마이</button>
+      </div>
+    </div>
+    <button class="dev-reset" data-dev="reset">처음부터 다시</button>
+    <p class="dev-state" id="devState"></p>
+  </aside>
+</div>
+<script src="pot-geo.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
